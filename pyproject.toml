@@ -33,3 +33,16 @@ tg-caller = "tg_caller.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["tg_caller"]
+
+[project.optional-dependencies]
+dev = ["ruff", "pytest", "build", "twine"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

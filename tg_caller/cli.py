@@ -13,6 +13,7 @@ Config (env vars, or ~/.config/tg-caller/config as KEY=VALUE lines):
     TG_TARGET      default target for call/msg when none is given
     RING_SECONDS   default ring duration (default 20)
 """
+
 from __future__ import annotations
 
 import argparse
@@ -21,8 +22,9 @@ import os
 import sys
 from pathlib import Path
 
-CONFIG_DIR = Path(os.environ.get(
-    "TG_CALLER_HOME", Path.home() / ".config" / "tg-caller"))
+CONFIG_DIR = Path(
+    os.environ.get("TG_CALLER_HOME", Path.home() / ".config" / "tg-caller")
+)
 CONFIG_FILE = CONFIG_DIR / "config"
 
 
@@ -43,8 +45,10 @@ def _creds() -> tuple[int, str]:
     try:
         return int(os.environ["TG_API_ID"]), os.environ["TG_API_HASH"]
     except KeyError:
-        sys.exit("missing TG_API_ID / TG_API_HASH (env or config file). "
-                 "Get them at https://my.telegram.org")
+        sys.exit(
+            "missing TG_API_ID / TG_API_HASH (env or config file). "
+            "Get them at https://my.telegram.org"
+        )
 
 
 def _session() -> str:
@@ -66,6 +70,7 @@ def cmd_login(_args) -> None:
     # Telethon's sync context manager runs the interactive login (phone, code,
     # optional 2FA password) via stdin prompts.
     from telethon.sync import TelegramClient
+
     api_id, api_hash = _creds()
     with TelegramClient(_session(), api_id, api_hash) as client:
         me = client.get_me()
@@ -75,6 +80,7 @@ def cmd_login(_args) -> None:
 
 def _run(coro):
     from .client import TgCaller
+
     api_id, api_hash = _creds()
 
     async def runner():
@@ -92,6 +98,7 @@ def cmd_call(args) -> None:
         print(f"ringing {target} for {seconds}s ...")
         cid = await tg.ring(target, seconds=seconds)
         print(f"done (call id {cid})")
+
     _run(go)
 
 
@@ -102,6 +109,7 @@ def cmd_msg(args) -> None:
     async def go(tg):
         mid = await tg.message(target, text)
         print(f"sent (msg id {mid})")
+
     _run(go)
 
 
@@ -109,15 +117,20 @@ def cmd_whoami(_args) -> None:
     async def go(tg):
         me = await tg.whoami()
         print(f"{me.first_name} (id {me.id}, @{me.username})")
+
     _run(go)
 
 
 def main(argv=None) -> None:
-    p = argparse.ArgumentParser(prog="tg-caller",
-                                description="Ring/message Telegram users from your own account.")
+    p = argparse.ArgumentParser(
+        prog="tg-caller",
+        description="Ring/message Telegram users from your own account.",
+    )
     sub = p.add_subparsers(dest="cmd", required=True)
 
-    sub.add_parser("login", help="one-time interactive login").set_defaults(func=cmd_login)
+    sub.add_parser("login", help="one-time interactive login").set_defaults(
+        func=cmd_login
+    )
 
     pc = sub.add_parser("call", help="ring a user/number")
     pc.add_argument("target", nargs="?", help="username, id, or +phone")
@@ -129,7 +142,9 @@ def main(argv=None) -> None:
     pm.add_argument("text", nargs="*", help="message text (or pipe via stdin)")
     pm.set_defaults(func=cmd_msg)
 
-    sub.add_parser("whoami", help="show logged-in account").set_defaults(func=cmd_whoami)
+    sub.add_parser("whoami", help="show logged-in account").set_defaults(
+        func=cmd_whoami
+    )
 
     args = p.parse_args(argv)
     args.func(args)
