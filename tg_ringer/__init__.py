@@ -1,4 +1,4 @@
-"""tg-caller — ring and message any Telegram user from your own account (userbot).
+"""tg-ringer — ring and message any Telegram user from your own account (userbot).
 
 Account-to-account (MTProto), not a bot. The userbot places a real private
 Telegram call so the target's phone *rings* (use as an urgent alert), or sends
@@ -7,7 +7,7 @@ a direct message.
 Basic use:
 
     import asyncio
-    from tg_caller import TgCaller
+    from tg_ringer import TgCaller
 
     async def main():
         async with TgCaller(api_id, api_hash, "userbot") as tg:

@@ -1,11 +1,11 @@
-# tg-caller
+# tg-ringer
 
 **Ring (call) and message any Telegram user from your own account.**
 A tiny [Telethon](https://github.com/LonamiWebs/Telethon) userbot for **urgent alerts** —
 it places a real private Telegram call so your phone *rings*, then hangs up.
 
-[⭐ GitHub repo](https://github.com/jdp5949/tg-caller) ·
-[📦 PyPI](https://pypi.org/project/tg-caller/)
+[⭐ GitHub repo](https://github.com/jdp5949/tg-ringer) ·
+[📦 PyPI](https://pypi.org/project/tg-ringer/)
 
 ---
 
@@ -13,7 +13,7 @@ it places a real private Telegram call so your phone *rings*, then hangs up.
 
 Telegram **bots cannot place calls**. A *userbot* (your own account, via MTProto)
 can. When a build fails or prod goes down at 3am, a silent push is easy to miss — a
-**ringing phone** is not. `tg-caller` turns any script event into a phone ring, for
+**ringing phone** is not. `tg-ringer` turns any script event into a phone ring, for
 free, using Telegram you already have.
 
 ---
@@ -33,11 +33,11 @@ free, using Telegram you already have.
 ## Quick start
 
 ```bash
-pip install tg-caller
+pip install tg-ringer
 ```
 
 1. Get `api_id` / `api_hash` at <https://my.telegram.org>.
-2. Put them in `~/.config/tg-caller/config`:
+2. Put them in `~/.config/tg-ringer/config`:
 
    ```ini
    TG_API_ID=1234567
@@ -48,14 +48,14 @@ pip install tg-caller
 3. Log in once (use a **separate** account as the userbot — you can't call yourself):
 
    ```bash
-   tg-caller login
+   tg-ringer login
    ```
 
 4. Ring it:
 
    ```bash
-   tg-caller call +15551234567
-   tg-caller msg  +15551234567 "deploy done"
+   tg-ringer call +15551234567
+   tg-ringer msg  +15551234567 "deploy done"
    ```
 
 ---
@@ -63,14 +63,14 @@ pip install tg-caller
 ## In scripts
 
 ```bash
-long_task && tg-caller msg "$ALERT" "✅ done" || tg-caller call "$ALERT"
+long_task && tg-ringer msg "$ALERT" "✅ done" || tg-ringer call "$ALERT"
 ```
 
 ## In Python
 
 ```python
 import asyncio
-from tg_caller import TgCaller
+from tg_ringer import TgCaller
 
 async def main():
     async with TgCaller(api_id, api_hash, "userbot") as tg:
@@ -92,7 +92,7 @@ asyncio.run(main())
   or use a non-VoIP number.
 
 Full docs & troubleshooting: see the
-[README](https://github.com/jdp5949/tg-caller#readme).
+[README](https://github.com/jdp5949/tg-ringer#readme).
 
 ---
 

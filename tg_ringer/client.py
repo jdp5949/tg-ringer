@@ -33,7 +33,7 @@ class TgCaller:
     async def __aenter__(self) -> TgCaller:
         await self.client.connect()
         if not await self.client.is_user_authorized():
-            raise RuntimeError("session not authorized — run `tg-caller login` first")
+            raise RuntimeError("session not authorized — run `tg-ringer login` first")
         return self
 
     async def __aexit__(self, *exc) -> None:

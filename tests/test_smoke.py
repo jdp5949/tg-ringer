@@ -2,17 +2,17 @@
 
 import pytest
 
-import tg_caller
-from tg_caller import TgCaller, cli
+import tg_ringer
+from tg_ringer import TgCaller, cli
 
 
 def test_version():
-    assert isinstance(tg_caller.__version__, str)
-    assert tg_caller.__version__.count(".") >= 2
+    assert isinstance(tg_ringer.__version__, str)
+    assert tg_ringer.__version__.count(".") >= 2
 
 
 def test_exports_client():
-    assert TgCaller is tg_caller.TgCaller
+    assert TgCaller is tg_ringer.TgCaller
 
 
 def test_client_constructs(tmp_path):
@@ -25,7 +25,7 @@ def test_cli_help_exits_zero(capsys):
     with pytest.raises(SystemExit) as exc:
         cli.main(["--help"])
     assert exc.value.code == 0
-    assert "tg-caller" in capsys.readouterr().out
+    assert "tg-ringer" in capsys.readouterr().out
 
 
 def test_cli_requires_subcommand():

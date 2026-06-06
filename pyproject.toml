@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "tg-caller"
+name = "tg-ringer"
 version = "0.1.0"
 description = "Ring (call) and message any Telegram user from your own account — urgent alerts via a real Telegram call."
 readme = "README.md"
@@ -23,16 +23,16 @@ classifiers = [
 dependencies = ["telethon>=1.36,<2"]
 
 [project.urls]
-Homepage = "https://github.com/jdp5949/tg-caller"
-Documentation = "https://jdp5949.github.io/tg-caller/"
-Repository = "https://github.com/jdp5949/tg-caller"
-Issues = "https://github.com/jdp5949/tg-caller/issues"
+Homepage = "https://github.com/jdp5949/tg-ringer"
+Documentation = "https://jdp5949.github.io/tg-ringer/"
+Repository = "https://github.com/jdp5949/tg-ringer"
+Issues = "https://github.com/jdp5949/tg-ringer/issues"
 
 [project.scripts]
-tg-caller = "tg_caller.cli:main"
+tg-ringer = "tg_ringer.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["tg_caller"]
+packages = ["tg_ringer"]
 
 [project.optional-dependencies]
 dev = ["ruff", "pytest", "build", "twine"]

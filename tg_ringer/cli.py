@@ -1,15 +1,15 @@
-"""Command-line interface for tg-caller.
+"""Command-line interface for tg-ringer.
 
 Commands:
-    tg-caller login                 one-time interactive login (phone + code)
-    tg-caller call  TARGET [-s N]   ring a user/number for N seconds
-    tg-caller msg   TARGET TEXT     send a direct message
-    tg-caller whoami                show the logged-in userbot account
+    tg-ringer login                 one-time interactive login (phone + code)
+    tg-ringer call  TARGET [-s N]   ring a user/number for N seconds
+    tg-ringer msg   TARGET TEXT     send a direct message
+    tg-ringer whoami                show the logged-in userbot account
 
-Config (env vars, or ~/.config/tg-caller/config as KEY=VALUE lines):
+Config (env vars, or ~/.config/tg-ringer/config as KEY=VALUE lines):
     TG_API_ID      required
     TG_API_HASH    required
-    TG_SESSION     session file path (default ~/.config/tg-caller/userbot)
+    TG_SESSION     session file path (default ~/.config/tg-ringer/userbot)
     TG_TARGET      default target for call/msg when none is given
     RING_SECONDS   default ring duration (default 20)
 """
@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 CONFIG_DIR = Path(
-    os.environ.get("TG_CALLER_HOME", Path.home() / ".config" / "tg-caller")
+    os.environ.get("TG_RINGER_HOME", Path.home() / ".config" / "tg-ringer")
 )
 CONFIG_FILE = CONFIG_DIR / "config"
 
@@ -123,7 +123,7 @@ def cmd_whoami(_args) -> None:
 
 def main(argv=None) -> None:
     p = argparse.ArgumentParser(
-        prog="tg-caller",
+        prog="tg-ringer",
         description="Ring/message Telegram users from your own account.",
     )
     sub = p.add_subparsers(dest="cmd", required=True)

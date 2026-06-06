@@ -1,4 +1,4 @@
-# tg-caller
+# tg-ringer
 
 Ring (call) and message **any Telegram user from your own account** — a lightweight
 [Telethon](https://github.com/LonamiWebs/Telethon) userbot for **urgent alerts**.
@@ -28,7 +28,7 @@ account-to-account messages.
 ## Install
 
 ```bash
-pip install tg-caller
+pip install tg-ringer
 ```
 
 Requires Python 3.9+.
@@ -43,8 +43,8 @@ Requires Python 3.9+.
 2. **Configure.** Either export env vars or write a config file:
 
    ```bash
-   mkdir -p ~/.config/tg-caller
-   cat > ~/.config/tg-caller/config <<'EOF'
+   mkdir -p ~/.config/tg-ringer
+   cat > ~/.config/tg-ringer/config <<'EOF'
    TG_API_ID=1234567
    TG_API_HASH=0123456789abcdef0123456789abcdef
    TG_TARGET=+15551234567      # optional default target
@@ -55,7 +55,7 @@ Requires Python 3.9+.
 3. **Log in** (interactive — sends a code to your Telegram app):
 
    ```bash
-   tg-caller login
+   tg-ringer login
    ```
 
    Enter the **userbot account's** phone number, then the login code (delivered
@@ -71,22 +71,22 @@ Requires Python 3.9+.
 
 ```bash
 # Ring a number (or @username, or numeric id) — phone rings, then hangs up
-tg-caller call +15551234567
-tg-caller call @someuser --seconds 30
-tg-caller call                       # uses TG_TARGET
+tg-ringer call +15551234567
+tg-ringer call @someuser --seconds 30
+tg-ringer call                       # uses TG_TARGET
 
 # Send a direct message
-tg-caller msg +15551234567 "deploy finished"
-echo "piped body" | tg-caller msg @someuser
+tg-ringer msg +15551234567 "deploy finished"
+echo "piped body" | tg-ringer msg @someuser
 
 # Who am I logged in as?
-tg-caller whoami
+tg-ringer whoami
 ```
 
 ### In scripts
 
 ```bash
-long_task && tg-caller msg "$ALERT" "✅ done" || tg-caller call "$ALERT"
+long_task && tg-ringer msg "$ALERT" "✅ done" || tg-ringer call "$ALERT"
 ```
 
 ---
@@ -95,7 +95,7 @@ long_task && tg-caller msg "$ALERT" "✅ done" || tg-caller call "$ALERT"
 
 ```python
 import asyncio
-from tg_caller import TgCaller
+from tg_ringer import TgCaller
 
 async def main():
     async with TgCaller(api_id=1234567, api_hash="...", session="userbot") as tg:
@@ -151,7 +151,7 @@ account's restriction status.
 
 - Your `api_hash` and the `*.session` file grant **full access to the userbot
   account**. Never commit or share them. The config and session live under
-  `~/.config/tg-caller/` and are git-ignored in this repo.
+  `~/.config/tg-ringer/` and are git-ignored in this repo.
 - Revoke a leaked session from any Telegram client: *Settings → Devices → Terminate*.
 
 ---
@@ -161,7 +161,7 @@ account's restriction status.
 | Symptom | Fix |
 |---------|-----|
 | `PeerFloodError` | Account anti-spam limited. Make caller+target mutual contacts; check `@SpamBot`; wait; or use a non-VoIP number. |
-| `session not authorized` | Run `tg-caller login`. |
+| `session not authorized` | Run `tg-ringer login`. |
 | Login code never arrives | It's delivered **in the Telegram app** ("Telegram" service chat), not SMS. The userbot number must be logged into a Telegram client. |
 | Target not on Telegram | `+phone` must belong to a Telegram account. |
 | No notification but message sent | Receiver chat is muted / OS notifications off. |
