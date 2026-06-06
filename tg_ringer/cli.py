@@ -1,17 +1,19 @@
 """Command-line interface for tg-ringer.
 
 Commands:
-    tg-ringer login                 one-time interactive login (phone + code)
+    tg-ringer init                  interactive setup (saves api_id/api_hash/target)
+    tg-ringer login                 set up (if needed) + log the userbot in
     tg-ringer call  TARGET [-s N]   ring a user/number for N seconds
     tg-ringer msg   TARGET TEXT     send a direct message
     tg-ringer whoami                show the logged-in userbot account
+    tg-ringer config                show current config (api_hash masked)
 
-Config (env vars, or ~/.config/tg-ringer/config as KEY=VALUE lines):
-    TG_API_ID      required
-    TG_API_HASH    required
-    TG_SESSION     session file path (default ~/.config/tg-ringer/userbot)
-    TG_TARGET      default target for call/msg when none is given
-    RING_SECONDS   default ring duration (default 20)
+Config is read from (first wins): environment variables, then
+``~/.config/tg-ringer/config`` (KEY=VALUE lines). Keys:
+    TG_API_ID, TG_API_HASH   required (set once via `init`/`login`)
+    TG_SESSION               session file path (default ~/.config/tg-ringer/userbot)
+    TG_TARGET                default target for call/msg
+    RING_SECONDS             default ring duration (default 20)
 """
 
 from __future__ import annotations
@@ -40,15 +42,47 @@ def _load_config() -> None:
         os.environ.setdefault(key.strip(), val.strip().strip('"').strip("'"))
 
 
-def _creds() -> tuple[int, str]:
+def _save_config(values: dict[str, str]) -> None:
+    """Write/merge KEY=VALUE pairs into the config file (chmod 600)."""
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    existing: dict[str, str] = {}
+    if CONFIG_FILE.exists():
+        for line in CONFIG_FILE.read_text().splitlines():
+            if "=" in line and not line.strip().startswith("#"):
+                k, _, v = line.partition("=")
+                existing[k.strip()] = v.strip()
+    existing.update({k: v for k, v in values.items() if v})
+    body = "# tg-ringer config — keep private (contains api_hash)\n"
+    body += "\n".join(f"{k}={v}" for k, v in existing.items()) + "\n"
+    CONFIG_FILE.write_text(body)
+    CONFIG_FILE.chmod(0o600)
+
+
+def _is_configured() -> bool:
     _load_config()
-    try:
-        return int(os.environ["TG_API_ID"]), os.environ["TG_API_HASH"]
-    except KeyError:
-        sys.exit(
-            "missing TG_API_ID / TG_API_HASH (env or config file). "
-            "Get them at https://my.telegram.org"
-        )
+    return bool(os.environ.get("TG_API_ID") and os.environ.get("TG_API_HASH"))
+
+
+def _interactive_setup() -> None:
+    """Prompt for credentials and save them. Safe to re-run."""
+    print("tg-ringer setup — get api_id/api_hash at https://my.telegram.org\n")
+    api_id = input("api_id  : ").strip()
+    api_hash = input("api_hash: ").strip()
+    target = input("default target (optional, e.g. +15551234567): ").strip()
+    if not api_id or not api_hash:
+        sys.exit("api_id and api_hash are required")
+    values = {"TG_API_ID": api_id, "TG_API_HASH": api_hash}
+    if target:
+        values["TG_TARGET"] = target
+    _save_config(values)
+    _load_config()  # refresh process env
+    print(f"\nSaved to {CONFIG_FILE}")
+
+
+def _creds() -> tuple[int, str]:
+    if not _is_configured():
+        sys.exit("not configured — run `tg-ringer init` (or `tg-ringer login`)")
+    return int(os.environ["TG_API_ID"]), os.environ["TG_API_HASH"]
 
 
 def _session() -> str:
@@ -66,7 +100,28 @@ def _target(arg: str | None) -> str:
     return t
 
 
+def cmd_init(_args) -> None:
+    _interactive_setup()
+    print("Next: run `tg-ringer login` to sign the userbot in.")
+
+
+def cmd_config(_args) -> None:
+    _load_config()
+    api_hash = os.environ.get("TG_API_HASH", "")
+    masked = (api_hash[:4] + "…" + api_hash[-4:]) if len(api_hash) > 8 else "(unset)"
+    exists = "exists" if CONFIG_FILE.exists() else "none"
+    print(f"config file : {CONFIG_FILE} ({exists})")
+    print(f"TG_API_ID   : {os.environ.get('TG_API_ID', '(unset)')}")
+    print(f"TG_API_HASH : {masked}")
+    print(f"TG_TARGET   : {os.environ.get('TG_TARGET', '(unset)')}")
+    print(f"TG_SESSION  : {_session()}.session")
+    print(f"RING_SECONDS: {os.environ.get('RING_SECONDS', '20')}")
+
+
 def cmd_login(_args) -> None:
+    # First-run friendly: if not configured, walk through setup.
+    if not _is_configured():
+        _interactive_setup()
     # Telethon's sync context manager runs the interactive login (phone, code,
     # optional 2FA password) via stdin prompts.
     from telethon.sync import TelegramClient
@@ -128,9 +183,13 @@ def main(argv=None) -> None:
     )
     sub = p.add_subparsers(dest="cmd", required=True)
 
-    sub.add_parser("login", help="one-time interactive login").set_defaults(
-        func=cmd_login
+    sub.add_parser("init", help="interactive setup (save credentials)").set_defaults(
+        func=cmd_init
     )
+    sub.add_parser(
+        "login", help="set up (if needed) + log the userbot in"
+    ).set_defaults(func=cmd_login)
+    sub.add_parser("config", help="show current config").set_defaults(func=cmd_config)
 
     pc = sub.add_parser("call", help="ring a user/number")
     pc.add_argument("target", nargs="?", help="username, id, or +phone")

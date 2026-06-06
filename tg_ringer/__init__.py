@@ -20,4 +20,4 @@ Basic use:
 from .client import TgCaller
 
 __all__ = ["TgCaller"]
-__version__ = "0.1.0"
+__version__ = "0.2.0"

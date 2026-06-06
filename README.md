@@ -35,35 +35,38 @@ Requires Python 3.9+.
 
 ---
 
-## Setup (one time)
+## Setup (one command)
 
-1. **Get API credentials** at <https://my.telegram.org> → *API development tools* →
-   create an app. Copy the **`api_id`** (number) and **`api_hash`** (string).
+Just run `login` — it walks you through everything the first time (no files to edit):
 
-2. **Configure.** Either export env vars or write a config file:
+```bash
+tg-ringer login
+```
 
-   ```bash
-   mkdir -p ~/.config/tg-ringer
-   cat > ~/.config/tg-ringer/config <<'EOF'
-   TG_API_ID=1234567
-   TG_API_HASH=0123456789abcdef0123456789abcdef
-   TG_TARGET=+15551234567      # optional default target
-   RING_SECONDS=20             # optional
-   EOF
-   ```
+It will:
+1. Prompt for your **`api_id`** / **`api_hash`** (get them at <https://my.telegram.org>
+   → *API development tools*) and an optional default target, then save them to
+   `~/.config/tg-ringer/config` (chmod 600).
+2. Ask for the **userbot account's** phone number, the login code (delivered *inside
+   Telegram*, not SMS), and a 2FA password if you have one.
 
-3. **Log in** (interactive — sends a code to your Telegram app):
-
-   ```bash
-   tg-ringer login
-   ```
-
-   Enter the **userbot account's** phone number, then the login code (delivered
-   *inside Telegram*, not SMS), and a 2FA password if you have one. This creates a
-   session file so future calls run unattended.
+Later runs skip setup and just sign in. Re-run setup anytime with `tg-ringer init`;
+inspect it with `tg-ringer config`.
 
 > Use a **separate account** as the userbot — not the one you want to ring. You
 > cannot call yourself.
+
+### Configuration values
+
+Saved by `login`/`init`, or supplied as env vars (env takes precedence — handy in CI):
+
+| Var | Meaning |
+|-----|---------|
+| `TG_API_ID`, `TG_API_HASH` | credentials (required) |
+| `TG_TARGET` | default target for `call`/`msg` |
+| `RING_SECONDS` | default ring duration (20) |
+| `TG_SESSION` | session file path |
+| `TG_RINGER_HOME` | config directory override |
 
 ---
 
