@@ -33,6 +33,18 @@ pip install tg-ringer
 
 Requires Python 3.9+.
 
+### Also available in other languages 🌍
+
+| Language | Install | Downloads |
+|----------|---------|-----------|
+| 🐍 Python | `pip install tg-ringer` | [PyPI](https://pypi.org/project/tg-ringer/) |
+| 🐹 Go | `go install github.com/jdp5949/tg-ringer-go/cmd/tg-ringer@latest` | [binaries](https://github.com/jdp5949/tg-ringer-go/releases) |
+| 🟢 Node/TS | `npm install github:jdp5949/tg-ringer-js` | [tarball](https://github.com/jdp5949/tg-ringer-js/releases) |
+| ☕ Java | JitPack `com.github.jdp5949:tg-ringer-java:v0.1.0` | [jars](https://github.com/jdp5949/tg-ringer-java/releases) |
+| 🦀 Rust | `cargo install --git https://github.com/jdp5949/tg-ringer-rs` | [binaries](https://github.com/jdp5949/tg-ringer-rs/releases) |
+
+Full docs & use cases: **https://jdp5949.github.io/tg-ringer/**
+
 ---
 
 ## Setup (one command)
