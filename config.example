@@ -1,0 +1,10 @@
+# Copy to ~/.config/tg-ringer/config and fill in.
+# Get TG_API_ID / TG_API_HASH at https://my.telegram.org (API development tools).
+
+TG_API_ID=1234567
+TG_API_HASH=0123456789abcdef0123456789abcdef
+
+# Optional:
+# TG_SESSION=/Users/you/.config/tg-ringer/userbot   # session file path (no .session)
+# TG_TARGET=+15551234567                             # default target
+# RING_SECONDS=20                                    # default ring duration

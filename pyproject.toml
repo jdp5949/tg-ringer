@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tg-ringer"
+version = "0.1.0"
+description = "Ring (call) and message any Telegram user from your own account — urgent alerts via a real Telegram call."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "jdp5949" }]
+keywords = ["telegram", "call", "alert", "notification", "userbot", "mtproto", "telethon"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Communications :: Telephony",
+    "Topic :: Communications :: Chat",
+]
+dependencies = ["telethon>=1.36,<2"]
+
+[project.urls]
+Homepage = "https://github.com/jdp5949/tg-ringer"
+Documentation = "https://jdp5949.github.io/tg-ringer/"
+Repository = "https://github.com/jdp5949/tg-ringer"
+Issues = "https://github.com/jdp5949/tg-ringer/issues"
+
+[project.scripts]
+tg-ringer = "tg_ringer.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["tg_ringer"]
+
+[project.optional-dependencies]
+dev = ["ruff", "pytest", "build", "twine"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
