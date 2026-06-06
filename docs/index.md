@@ -107,21 +107,55 @@ That's it. `login` walks you through setup the first time; later runs just sign 
 
 ## Usage
 
-### CLI
+### Commands (all languages)
+
+| Command | What it does |
+|---------|--------------|
+| `login` | Interactive setup (api_id/api_hash) + sign in |
+| `init` | (Re)configure credentials only |
+| `config` | Show current config (api_hash masked) |
+| `call TARGET [secs]` | Ring a user/number, then hang up |
+| `msg TARGET TEXT…` | Send a direct message |
+| `whoami` | Show the logged-in account |
+| `status` | Check anti-spam state via `@SpamBot` |
+
+`TARGET` = `@username`, numeric id, or `+E164` phone number.
+
+> `status` is available in Python, Go, Rust, and Java (Rust/Java call the Go binary).
+> Node gains it in an upcoming release.
+
+### Running the CLI in each language
 
 ```bash
-tg-ringer init                       # (re)configure credentials interactively
-tg-ringer config                     # show current config (api_hash masked)
-tg-ringer call +15551234567          # ring a number
-tg-ringer call @someuser --seconds 30
-tg-ringer call                       # ring the default target
-tg-ringer msg  +15551234567 "deploy finished"
-echo "piped body" | tg-ringer msg @someuser
-tg-ringer whoami
+# Python  (pip install tg-ringer)
+tg-ringer call +15551234567
+
+# Go      (downloaded binary or `go install`)
+tg-ringer call +15551234567
+
+# Rust    (downloaded binary or `cargo install`)
+tg-ringer call +15551234567
+
+# Node    (npm install github:jdp5949/tg-ringer-js)
+npx tg-ringer call +15551234567
+
+# Java    (downloaded runnable jar)
+java -jar tg-ringer-java-0.1.0.jar call +15551234567
 ```
 
-### Python
+Examples (any CLI):
 
+```bash
+tg-ringer login                       # first-time setup + sign in
+tg-ringer call                        # ring the default target (TG_TARGET)
+tg-ringer call @someuser 30           # ring @someuser for 30s
+tg-ringer msg  +15551234567 "deploy finished"
+tg-ringer status                      # is my account flagged?
+```
+
+### Library usage per language
+
+**Python**
 ```python
 import asyncio
 from tg_ringer import TgCaller
@@ -132,6 +166,42 @@ async def main():
         await tg.message("+15551234567", "heads up")
 
 asyncio.run(main())
+```
+
+**Go**
+```go
+import "github.com/jdp5949/tg-ringer-go/ringer"
+
+ringer.Run(ctx, cfg, func(ctx context.Context, c *ringer.Client) error {
+    _, err := c.Ring(ctx, "+15551234567", 20)
+    return err
+})
+```
+
+**Node / TypeScript**
+```ts
+import { TgRinger } from "tg-ringer";
+
+const r = new TgRinger({ apiId, apiHash, session });
+await r.connect();
+await r.ring("+15551234567", 20);
+await r.message("+15551234567", "heads up");
+await r.disconnect();
+```
+
+**Rust**
+```rust
+tg_ringer::ring("+15551234567", 20)?;
+tg_ringer::message("+15551234567", "heads up")?;
+```
+
+**Java**
+```java
+import io.github.jdp5949.tgringer.TgRinger;
+
+TgRinger tg = new TgRinger();
+tg.ring("+15551234567", 20);
+tg.message("+15551234567", "heads up");
 ```
 
 ### Configuration

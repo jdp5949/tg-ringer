@@ -6,6 +6,7 @@ Commands:
     tg-ringer call  TARGET [-s N]   ring a user/number for N seconds
     tg-ringer msg   TARGET TEXT     send a direct message
     tg-ringer whoami                show the logged-in userbot account
+    tg-ringer status                check anti-spam status via @SpamBot
     tg-ringer config                show current config (api_hash masked)
 
 Config is read from (first wins): environment variables, then
@@ -176,6 +177,16 @@ def cmd_whoami(_args) -> None:
     _run(go)
 
 
+def cmd_status(_args) -> None:
+    async def go(tg):
+        print("asking @SpamBot ...")
+        reply = await tg.spam_status()
+        print("---")
+        print(reply)
+
+    _run(go)
+
+
 def main(argv=None) -> None:
     p = argparse.ArgumentParser(
         prog="tg-ringer",
@@ -203,6 +214,9 @@ def main(argv=None) -> None:
 
     sub.add_parser("whoami", help="show logged-in account").set_defaults(
         func=cmd_whoami
+    )
+    sub.add_parser("status", help="check anti-spam status via @SpamBot").set_defaults(
+        func=cmd_status
     )
 
     args = p.parse_args(argv)

@@ -115,3 +115,13 @@ class TgCaller:
     async def whoami(self):
         """Return the logged-in userbot account (Telethon User)."""
         return await self.client.get_me()
+
+    async def spam_status(self) -> str:
+        """Ask ``@SpamBot`` for this account's anti-spam status; return its reply."""
+        import asyncio
+
+        await self.client.send_message("SpamBot", "/start")
+        await asyncio.sleep(3)
+        async for msg in self.client.iter_messages("SpamBot", limit=1):
+            return msg.text or "(no reply yet — try again in a moment)"
+        return "(no reply yet — try again in a moment)"

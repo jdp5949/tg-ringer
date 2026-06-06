@@ -96,7 +96,13 @@ echo "piped body" | tg-ringer msg @someuser
 
 # Who am I logged in as?
 tg-ringer whoami
+
+# Check anti-spam status via @SpamBot
+tg-ringer status
 ```
+
+Full command reference and **per-language usage** (Go/Node/Rust/Java invocation +
+library snippets): **https://jdp5949.github.io/tg-ringer/#usage**
 
 ### In scripts
 
