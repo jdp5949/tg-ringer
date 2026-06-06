@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tg-ringer"
-version = "0.2.0"
+version = "0.3.0"
 description = "Ring (call) and message any Telegram user from your own account — urgent alerts via a real Telegram call."
 readme = "README.md"
 requires-python = ">=3.9"

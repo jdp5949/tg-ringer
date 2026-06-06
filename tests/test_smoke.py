@@ -36,7 +36,9 @@ def test_cli_requires_subcommand():
     assert exc.value.code != 0
 
 
-@pytest.mark.parametrize("sub", ["init", "login", "call", "msg", "whoami", "config"])
+@pytest.mark.parametrize(
+    "sub", ["init", "login", "call", "msg", "whoami", "config", "status"]
+)
 def test_subcommand_help(sub, capsys):
     with pytest.raises(SystemExit) as exc:
         cli.main([sub, "--help"])
