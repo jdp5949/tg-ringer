@@ -121,8 +121,8 @@ That's it. `login` walks you through setup the first time; later runs just sign 
 
 `TARGET` = `@username`, numeric id, or `+E164` phone number.
 
-> `status` is available in Python, Go, Rust, and Java (Rust/Java call the Go binary).
-> Node gains it in an upcoming release.
+> All commands — including `status` — are available in **all five languages**
+> (Rust and Java run the native Go binary under the hood).
 
 ### Running the CLI in each language
 
