@@ -46,6 +46,25 @@ Telegram account you already have, with zero monthly cost.
 
 ---
 
+## Available in 5 languages 🌍
+
+Same tool, your stack. Pick a language — each has its own repo, CI, and downloadable
+builds on GitHub (no account or token needed to install).
+
+| Language | Install | Downloads |
+|----------|---------|-----------|
+| 🐍 **Python** | `pip install tg-ringer` | [PyPI](https://pypi.org/project/tg-ringer/) |
+| 🐹 **Go** | `go install github.com/jdp5949/tg-ringer-go/cmd/tg-ringer@latest` | [binaries](https://github.com/jdp5949/tg-ringer-go/releases) (Linux/macOS/Windows) |
+| 🟢 **Node/TS** | `npm install github:jdp5949/tg-ringer-js` | [tarball](https://github.com/jdp5949/tg-ringer-js/releases) |
+| ☕ **Java** | JitPack: `com.github.jdp5949:tg-ringer-java:v0.1.0` | [jars](https://github.com/jdp5949/tg-ringer-java/releases) |
+| 🦀 **Rust** | `cargo install --git https://github.com/jdp5949/tg-ringer-rs` | [binaries](https://github.com/jdp5949/tg-ringer-rs/releases) |
+
+> Python is the reference implementation (live-tested). Go is a native gotd/td port.
+> Java and Rust wrap the native Go binary. Node is a native GramJS port. The Go/Node/Rust/Java
+> ports are **beta** — same logic as Python, community testing welcome. 🙏
+
+---
+
 ## How it works
 
 ```mermaid
@@ -191,6 +210,26 @@ Automating a **user** account is a **gray area** under Telegram's Terms of Servi
 Accounts can be limited or banned (especially VoIP numbers / new accounts making
 automated calls). Keep volume low, use mutual contacts, use a throwaway account,
 never spam. Check status via `@SpamBot`. You use this at your own risk.
+
+---
+
+## 💛 Help & contributing
+
+We're genuinely happy to help you get this working — it's free, open source (MIT),
+and built to be useful. If you're stuck or have an idea:
+
+- **Questions / bugs** → open an issue on the repo for your language:
+  [Python](https://github.com/jdp5949/tg-ringer/issues) ·
+  [Go](https://github.com/jdp5949/tg-ringer-go/issues) ·
+  [Node](https://github.com/jdp5949/tg-ringer-js/issues) ·
+  [Java](https://github.com/jdp5949/tg-ringer-java/issues) ·
+  [Rust](https://github.com/jdp5949/tg-ringer-rs/issues)
+- **Pull requests welcome** — docs, fixes, new language ports, real-world testing of
+  the beta ports. No contribution is too small.
+- **New to Telegram userbots?** Start with the [Quick start](#quick-start-3-steps)
+  above; the `login` command walks you through everything.
+
+If something in these docs is unclear, that's on us — tell us and we'll fix it. 🙌
 
 ---
 
