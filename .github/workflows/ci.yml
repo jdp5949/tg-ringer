@@ -43,7 +43,7 @@ jobs:
       - name: Import smoke check
         run: python -c "import tg_ringer; print(tg_ringer.__version__)"
       - name: CLI smoke check
-        run: tg-caller --help
+        run: tg-ringer --help
 
   build:
     runs-on: ubuntu-latest
