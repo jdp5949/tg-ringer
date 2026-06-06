@@ -1,0 +1,21 @@
+# SECRETS — never commit
+*.session
+*.session-journal
+.login_state.json
+env
+.env
+config
+*.token
+
+# python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# os
+.DS_Store
