@@ -30,7 +30,6 @@ import os
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Optional
 
 from mcp.server.fastmcp import FastMCP
 
@@ -87,7 +86,7 @@ def _resolve_target(arg: str | None) -> str:
 # Singleton TgCaller (kept connected for the lifetime of the MCP process)
 # ---------------------------------------------------------------------------
 
-_caller: object | None = None  # TgCaller, typed as object to avoid import at module level
+_caller: object | None = None  # TgCaller; avoid top-level import of telethon
 
 
 @asynccontextmanager
@@ -121,8 +120,8 @@ def _tg():
 
 
 @mcp.tool()
-async def tg_ring(seconds: int = 20, target: Optional[str] = None) -> str:
-    """Ring a Telegram user so their phone rings, then hang up. No audio — the ring IS the alert.
+async def tg_ring(seconds: int = 20, target: str | None = None) -> str:
+    """Ring a Telegram user so their phone rings, then hang up. Ring IS the alert.
 
     Args:
         seconds: How long to let it ring before hanging up (default 20).
@@ -134,7 +133,7 @@ async def tg_ring(seconds: int = 20, target: Optional[str] = None) -> str:
 
 
 @mcp.tool()
-async def tg_message(text: str, target: Optional[str] = None) -> str:
+async def tg_message(text: str, target: str | None = None) -> str:
     """Send a Telegram direct message from the userbot account.
 
     Args:
@@ -166,7 +165,7 @@ async def tg_status() -> str:
 async def tg_ask(
     question: str,
     timeout: int = 120,
-    target: Optional[str] = None,
+    target: str | None = None,
 ) -> str:
     """Send a question to the Telegram user and wait for their reply.
 
@@ -193,7 +192,8 @@ async def tg_ask(
     entity = await tg.resolve(t)
 
     # Send the question
-    sent = await tg.client.send_message(entity, f"\U0001f916 Claude asks:\n\n{question}")
+    prompt = f"\U0001f916 Claude asks:\n\n{question}"
+    sent = await tg.client.send_message(entity, prompt)
     sent_date = sent.date
 
     # Poll for a reply (outgoing=False, newer than our sent message)
