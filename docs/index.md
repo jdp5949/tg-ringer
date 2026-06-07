@@ -250,9 +250,8 @@ tg-ringer login   # if not already configured
 
 ### Connect Claude Code (via SSH)
 
-The recommended setup: MCP server runs on a remote host (`mini4-india` or any
-SSH target), Claude Code connects over stdio through SSH. No open ports, no token —
-SSH key is the auth.
+The recommended setup: MCP server runs on a remote host you control, Claude Code
+connects over stdio through SSH. No open ports, no token — SSH key is the auth.
 
 ```json
 // ~/.claude/settings.json  (or project .claude/settings.json)
@@ -260,7 +259,7 @@ SSH key is the auth.
   "mcpServers": {
     "tg-ringer": {
       "command": "ssh",
-      "args": ["mini4-india", "tg-ringer-mcp"]
+      "args": ["your-server", "tg-ringer-mcp"]
     }
   }
 }
@@ -269,7 +268,7 @@ SSH key is the auth.
 If the `tg-ringer-mcp` binary isn't on the remote `PATH`, use the full path:
 
 ```json
-"args": ["mini4-india", "/home/ubuntu/tg-ringer-venv/bin/tg-ringer-mcp"]
+"args": ["your-server", "/path/to/venv/bin/tg-ringer-mcp"]
 ```
 
 ### Connect Claude Code (local)
@@ -296,7 +295,7 @@ Same JSON, placed in the Claude app's MCP config file
   "mcpServers": {
     "tg-ringer": {
       "command": "ssh",
-      "args": ["mini4-india", "tg-ringer-mcp"]
+      "args": ["your-server", "tg-ringer-mcp"]
     }
   }
 }
