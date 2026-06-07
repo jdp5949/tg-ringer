@@ -12,6 +12,46 @@ account-to-account messages.
 
 ---
 
+## MCP server — Claude Code & AI agent integration
+
+`tg-ringer` includes a **stdio MCP server** (`tg-ringer-mcp`) — wire it into
+Claude Code, the Claude desktop app, Cursor, Windsurf, or any MCP-compatible agent.
+
+```bash
+pip install 'tg-ringer[mcp]'
+```
+
+**Claude Code config** (SSH to remote host — no open ports, SSH key = auth):
+
+```json
+// ~/.claude/settings.json
+{
+  "mcpServers": {
+    "tg-ringer": {
+      "command": "ssh",
+      "args": ["your-server", "tg-ringer-mcp"]
+    }
+  }
+}
+```
+
+**5 MCP tools:**
+
+| Tool | Does |
+|------|------|
+| `tg_ring` | Ring a user (urgent interrupt) |
+| `tg_message` | Send a DM (quiet alert) |
+| `tg_whoami` | Show logged-in userbot |
+| `tg_status` | Check anti-spam via @SpamBot |
+| `tg_ask` | Ask a question, wait for your Telegram reply, return it to Claude |
+
+`tg_ask` is the standout: Claude sends you a question on Telegram, blocks until
+you reply, then continues with your answer — **human-in-the-loop via Telegram**.
+
+Full MCP docs → **https://jdp5949.github.io/tg-ringer/#mcp-server--claude-code--ai-agent-integration**
+
+---
+
 ## When to use it
 
 | You want… | Use this? |
@@ -19,6 +59,7 @@ account-to-account messages.
 | Phone to **ring** on a critical event (build failed, server down, prod alert) | ✅ yes |
 | A free alternative to paid call APIs, and you already live in Telegram | ✅ yes |
 | Account-to-account DM from a script (faster than Bot API on a warm connection) | ✅ yes |
+| Claude Code / AI agent to send you Telegram alerts or ask for input | ✅ yes |
 | Spoken/TTS audio in the call | ❌ no — ring only (see [limitations](#limitations)) |
 | Reach someone with **no internet** (real cellular call) | ❌ no — Telegram is VoIP; use Twilio/PSTN |
 | Mass messaging / spam | ❌ absolutely not — instant ban |
