@@ -42,6 +42,7 @@ Telegram account you already have, with zero monthly cost.
 | 🔁 **Auto-resolve numbers** | A `+phone` is imported as a temp contact so you can reach it. |
 | ⏱️ **Control ring length** | `--seconds` / `RING_SECONDS`. |
 | 🧩 **CLI + Python library** | Use from shell scripts or import `tg_ringer`. |
+| 🤖 **MCP server** | Claude Code / AI agent integration — 5 Telegram tools over stdio. |
 | 🆓 **Free** | No paid telephony, no per-call cost. |
 
 ---
@@ -217,6 +218,135 @@ variables (handy for CI), which take precedence:
 | `RING_SECONDS` | default ring duration (20) |
 | `TG_SESSION` | session file path |
 | `TG_RINGER_HOME` | config directory override |
+
+---
+
+## MCP server — Telegram tools for Claude Code and AI agents
+
+`tg-ringer` ships a **stdio MCP server** (`tg-ringer-mcp`) that exposes Telegram
+actions as tools any MCP-compatible AI agent can call: Claude Code, the Claude
+desktop app, Cursor, Windsurf, or any custom agent using the MCP SDK.
+
+### 5 MCP tools
+
+| Tool | What it does |
+|------|-------------|
+| `tg_ring` | Ring a Telegram user (phone rings, no audio). Best for urgent interrupts. |
+| `tg_message` | Send a direct message (quiet alert with detail). |
+| `tg_whoami` | Show which userbot account is logged in. |
+| `tg_status` | Check anti-spam status via `@SpamBot`. |
+| `tg_ask` | Send a question, wait for your Telegram reply, return it to the agent. |
+
+The killer tool is **`tg_ask`** — it lets an AI agent pause mid-task, message you
+on Telegram, and continue only once you reply. Human-in-the-loop over Telegram.
+
+### Install the MCP server
+
+```bash
+# on the machine that has the Telegram session (e.g. a remote server)
+pip install 'tg-ringer[mcp]'
+tg-ringer login   # if not already configured
+```
+
+### Connect Claude Code (via SSH)
+
+The recommended setup: MCP server runs on a remote host (`mini4-india` or any
+SSH target), Claude Code connects over stdio through SSH. No open ports, no token —
+SSH key is the auth.
+
+```json
+// ~/.claude/settings.json  (or project .claude/settings.json)
+{
+  "mcpServers": {
+    "tg-ringer": {
+      "command": "ssh",
+      "args": ["mini4-india", "tg-ringer-mcp"]
+    }
+  }
+}
+```
+
+If the `tg-ringer-mcp` binary isn't on the remote `PATH`, use the full path:
+
+```json
+"args": ["mini4-india", "/home/ubuntu/tg-ringer-venv/bin/tg-ringer-mcp"]
+```
+
+### Connect Claude Code (local)
+
+If the session lives on your laptop, skip SSH entirely:
+
+```json
+{
+  "mcpServers": {
+    "tg-ringer": {
+      "command": "tg-ringer-mcp"
+    }
+  }
+}
+```
+
+### Connect the Claude desktop app
+
+Same JSON, placed in the Claude app's MCP config file
+(`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+```json
+{
+  "mcpServers": {
+    "tg-ringer": {
+      "command": "ssh",
+      "args": ["mini4-india", "tg-ringer-mcp"]
+    }
+  }
+}
+```
+
+### Connect Cursor / Windsurf / any MCP client
+
+Any editor or agent that supports MCP servers over stdio works the same way —
+point it at `tg-ringer-mcp` (local) or `ssh <host> tg-ringer-mcp` (remote).
+
+### Using the tools
+
+Once connected, tell Claude (or any agent) in plain English:
+
+```
+After you finish the migration, ping me on Telegram.
+```
+
+Claude will call `tg_message` automatically. Or more explicitly:
+
+```
+Ring me on Telegram if the tests fail.
+```
+→ Claude calls `tg_ring` on failure.
+
+### tg_ask — human-in-the-loop via Telegram
+
+The most powerful tool: Claude pauses, messages you, and waits for your reply
+before continuing.
+
+```
+Before you delete those files, ask me via Telegram which ones to keep.
+```
+
+Flow:
+1. Claude calls `tg_ask("Which files should I keep? Reply with filenames.")`
+2. You get a Telegram DM: `🤖 Claude asks: Which files should I keep?`
+3. You reply in Telegram: `keep src/core.py and tests/`
+4. Claude receives your reply and continues with that input.
+
+Example in a script:
+
+```python
+# Any agent SDK that supports MCP tool calls
+result = await client.call_tool("tg_ask", {
+    "question": "Prod deploy ready. Confirm? (yes/no)",
+    "timeout": 300   # wait up to 5 minutes
+})
+# result = "yes"  ← your Telegram reply
+```
 
 ---
 
