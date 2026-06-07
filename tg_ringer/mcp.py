@@ -87,29 +87,56 @@ def _resolve_target(arg: str | None) -> str:
 # ---------------------------------------------------------------------------
 
 _caller: object | None = None  # TgCaller; avoid top-level import of telethon
+_caller_ready: asyncio.Event | None = None  # set once Telethon is connected
 
 
 @asynccontextmanager
 async def _lifespan(_server: FastMCP):
-    global _caller
+    global _caller, _caller_ready
     from tg_ringer.client import TgCaller
 
     api_id, api_hash = _creds()
     caller = TgCaller(api_id, api_hash, _session())
-    await caller.__aenter__()  # type: ignore[attr-defined]
-    _caller = caller
+    ready = asyncio.Event()
+    _caller_ready = ready
+
+    async def _connect() -> None:
+        global _caller
+        await caller.__aenter__()  # type: ignore[attr-defined]
+        _caller = caller
+        ready.set()
+
+    task = asyncio.create_task(_connect())
     try:
         yield
     finally:
         _caller = None
-        await caller.__aexit__(None, None, None)  # type: ignore[attr-defined]
+        _caller_ready = None
+        if not task.done():
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+        if ready.is_set():
+            await caller.__aexit__(None, None, None)  # type: ignore[attr-defined]
 
 
 mcp = FastMCP("tg-ringer", lifespan=_lifespan)
 
+# Tools wait up to 30 s for Telethon to connect before giving up.
+_CONNECT_TIMEOUT = 30
 
-def _tg():
-    """Return the live TgCaller, raising clearly if not ready."""
+
+async def _tg():
+    """Return live TgCaller, waiting for background connect if needed."""
+    if _caller_ready is not None and not _caller_ready.is_set():
+        try:
+            await asyncio.wait_for(_caller_ready.wait(), timeout=_CONNECT_TIMEOUT)
+        except TimeoutError:
+            raise RuntimeError(
+                "tg-ringer failed to connect within 30 s — check session on server"
+            )
     if _caller is None:
         raise RuntimeError("tg-ringer MCP not initialized — check session on server")
     return _caller  # type: ignore[return-value]
@@ -129,7 +156,7 @@ async def tg_ring(seconds: int = 20, target: str | None = None) -> str:
         target: @username, numeric id, or +E164 phone. Defaults to TG_TARGET env var.
     """
     t = _resolve_target(target)
-    cid = await _tg().ring(t, seconds=seconds)
+    cid = await (await _tg()).ring(t, seconds=seconds)
     return f"Rang {t} for {seconds}s (call id {cid})"
 
 
@@ -142,14 +169,14 @@ async def tg_message(text: str, target: str | None = None) -> str:
         target: @username, numeric id, or +E164 phone. Defaults to TG_TARGET env var.
     """
     t = _resolve_target(target)
-    mid = await _tg().message(t, text)
+    mid = await (await _tg()).message(t, text)
     return f"Sent to {t} (msg id {mid})"
 
 
 @mcp.tool()
 async def tg_whoami() -> str:
     """Return the logged-in userbot Telegram account (name, id, username)."""
-    me = await _tg().whoami()
+    me = await (await _tg()).whoami()
     uname = f"@{me.username}" if me.username else "(no username)"
     return f"{me.first_name} (id {me.id}, {uname})"
 
@@ -160,7 +187,7 @@ async def tg_status() -> str:
 
     Useful to diagnose PeerFloodError or call failures.
     """
-    return await _tg().spam_status()
+    return await (await _tg()).spam_status()
 
 
 @mcp.tool()
@@ -188,7 +215,7 @@ async def tg_ask(
         TimeoutError: If no reply arrives within `timeout` seconds.
     """
     t = _resolve_target(target)
-    tg = _tg()
+    tg = await _tg()
 
     # Resolve target entity (needed for message filtering)
     entity = await tg.resolve(t)
