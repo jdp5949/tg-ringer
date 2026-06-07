@@ -95,13 +95,14 @@ async def _lifespan(_server: FastMCP):
     from tg_ringer.client import TgCaller
 
     api_id, api_hash = _creds()
-    _caller = TgCaller(api_id, api_hash, _session())
-    await _caller.__aenter__()  # type: ignore[attr-defined]
+    caller = TgCaller(api_id, api_hash, _session())
+    await caller.__aenter__()  # type: ignore[attr-defined]
+    _caller = caller
     try:
         yield
     finally:
-        await _caller.__aexit__(None, None, None)  # type: ignore[attr-defined]
         _caller = None
+        await caller.__aexit__(None, None, None)  # type: ignore[attr-defined]
 
 
 mcp = FastMCP("tg-ringer", lifespan=_lifespan)
@@ -149,7 +150,8 @@ async def tg_message(text: str, target: str | None = None) -> str:
 async def tg_whoami() -> str:
     """Return the logged-in userbot Telegram account (name, id, username)."""
     me = await _tg().whoami()
-    return f"{me.first_name} (id {me.id}, @{me.username})"
+    uname = f"@{me.username}" if me.username else "(no username)"
+    return f"{me.first_name} (id {me.id}, {uname})"
 
 
 @mcp.tool()
@@ -194,13 +196,13 @@ async def tg_ask(
     # Send the question
     prompt = f"\U0001f916 Claude asks:\n\n{question}"
     sent = await tg.client.send_message(entity, prompt)
-    sent_date = sent.date
 
-    # Poll for a reply (outgoing=False, newer than our sent message)
+    # Poll for a reply using min_id so we only see messages after our question.
+    # This avoids date-comparison timezone issues and the same-second miss.
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
-        async for msg in tg.client.iter_messages(entity, limit=10):
-            if msg.date > sent_date and not msg.out:
+        async for msg in tg.client.iter_messages(entity, limit=50, min_id=sent.id):
+            if not msg.out:
                 return msg.raw_text or "(empty reply)"
         await asyncio.sleep(3)
 
